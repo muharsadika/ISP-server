@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 const { sequelize } = require('./src/models');
 
@@ -8,6 +9,7 @@ const jabatanRoute = require('./src/routes/jabatanRoute');
 const karyawanRoute = require('./src/routes/karyawanRoute');
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use('/test', (req, res) => {
     res.send('Server connected!');

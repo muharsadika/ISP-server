@@ -1,9 +1,20 @@
 const { Karyawan } = require('../models');
+const { Jabatan } = require('../models');
 
 exports.getAllKaryawans = async (req, res) => {
     try {
-        const karyawans = await Karyawan.findAll();
-        res.json(karyawans);
+        const karyawans = await Karyawan.findAll({
+            include: [{ model: Jabatan, attributes: ['nama_jabatan'] }],
+        });
+        const karyawansWithJabatan = karyawans.map((karyawan) => {
+            const karyawasData = karyawan.toJSON();
+            const { Jabatan, ...karyawanData } = karyawasData;
+            return {
+                ...karyawanData,
+                nama_jabatan: Jabatan.nama_jabatan,
+            };
+        });
+        res.json(karyawansWithJabatan);
     } catch (error) {
         res.status(500).send(error.message);
     }
@@ -12,9 +23,18 @@ exports.getAllKaryawans = async (req, res) => {
 exports.getByIdKaryawan = async (req, res) => {
     try {
         const { id } = req.params;
-        const karyawan = await Karyawan.findByPk(id);
+        const karyawan = await Karyawan.findByPk(id, {
+            include: [{ model: Jabatan, attributes: ['nama_jabatan'] }],
+        });
         if (karyawan) {
-            res.json(karyawan);
+            const karyawanData = karyawan.toJSON();
+            const { Jabatan, ...rest } = karyawanData;
+            const karyawanWithJabatan = {
+                ...rest,
+                nama_jabatan: Jabatan.nama_jabatan,
+            };
+
+            res.json(karyawanWithJabatan);
         } else {
             res.status(404).send('Karyawan not found');
         }
